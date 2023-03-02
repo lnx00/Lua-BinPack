@@ -14,7 +14,7 @@ function BinPack.pack(...)
     local result = {}
 
     for _, arg in ipairs(args) do
-        table.insert(result, string.char(string.len(arg)))
+        table.insert(result, string.len(arg) .. "\0")
         table.insert(result, arg)
     end
 
@@ -29,10 +29,12 @@ function BinPack.unpack(data)
     local offset = 1
 
     while offset <= string.len(data) do
-        local length = string.byte(data, offset)
-        local value = string.sub(data, offset + 1, offset + length)
+        local dataOffset = string.find(data, "\0", offset, true)
+        local length = tonumber(string.sub(data, offset, dataOffset - 1))
+        local value = string.sub(data, dataOffset + 1, dataOffset + length)
+
+        offset = dataOffset + length + 1
         table.insert(result, value)
-        offset = offset + length + 1
     end
 
     return result
@@ -41,13 +43,15 @@ end
 -- Packs and saves a binary file
 ---@param path string
 ---@vararg string
+---@return boolean
 function BinPack.save(path, ...)
     local file = io.open(path, "wb")
-    if not file then return nil end
+    if not file then return false end
 
     local data = BinPack.pack(...)
     file:write(data)
     file:close()
+    return true
 end
 
 -- Loads a binary file and unpacks it
@@ -60,6 +64,26 @@ function BinPack.load(path)
     local data = file:read("*all")
     file:close()
     return BinPack.unpack(data)
+end
+
+-- Packs multiple files into a single binary file
+---@param path string
+---@vararg string
+function BinPack.packFiles(path, ...)
+    local paths = { ... }
+    local files = {}
+
+    for _, path in ipairs(paths) do
+        local file = io.open(path, "rb")
+        if not file then return nil end
+
+        local data = file:read("*all")
+        file:close()
+
+        table.insert(files, data)
+    end
+
+    return BinPack.save(path, table.unpack(files))
 end
 
 return BinPack
