@@ -50,4 +50,16 @@ function BinPack.save(path, ...)
     file:close()
 end
 
+-- Loads a binary file and unpacks it
+---@param path string
+---@return table?
+function BinPack.load(path)
+    local file = io.open(path, "rb")
+    if not file then return nil end
+
+    local data = file:read("*all")
+    file:close()
+    return BinPack.unpack(data)
+end
+
 return BinPack
