@@ -18,3 +18,10 @@ do
     assert(result[2] == data2)
     print("Unpacked data successfully")
 end
+
+-- Pack and save the sample data
+do
+    BinPack.save("Test.bin", data1, data2)
+    assert(io.open("Test.bin", "rb"):read("*a") == expected)
+    print("Saved data successfully")
+end

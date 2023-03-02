@@ -38,4 +38,16 @@ function BinPack.unpack(data)
     return result
 end
 
+-- Packs and saves a binary file
+---@param path string
+---@vararg string
+function BinPack.save(path, ...)
+    local file = io.open(path, "wb")
+    if not file then return nil end
+
+    local data = BinPack.pack(...)
+    file:write(data)
+    file:close()
+end
+
 return BinPack
