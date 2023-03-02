@@ -47,3 +47,4 @@ end
 
 -- Delete the sample data file
 os.remove("test.bin")
+os.remove("images.dat")

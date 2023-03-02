@@ -40,4 +40,5 @@ luac.out
 *.hex
 
 # Test binary
-Test.bin
+test.bin
+images.bin
