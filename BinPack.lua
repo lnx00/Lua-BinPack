@@ -51,6 +51,8 @@ function BinPack.save(path, ...)
     if not file then return false end
 
     local data = BinPack.pack(...)
+    if not data then return false end
+
     file:write(data)
     file:close()
     return true
@@ -71,13 +73,14 @@ end
 -- Packs multiple files into a single binary file
 ---@param path string
 ---@vararg string
+---@return boolean
 function BinPack.packFiles(outPath, ...)
     local paths = { ... }
     local files = {}
 
     for _, path in ipairs(paths) do
         local file = io.open(path, "rb")
-        if not file then return nil end
+        if not file then return false end
 
         local data = file:read("*all")
         file:close()
