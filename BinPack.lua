@@ -23,14 +23,16 @@ end
 
 -- Unpacks a packed byte string into multiple byte strings
 ---@param data string
----@return table
+---@return table?
 function BinPack.unpack(data)
     local result = {}
     local offset = 1
 
     while offset <= string.len(data) do
         local dataOffset = string.find(data, "\0", offset, true)
+        if not dataOffset then return nil end
         local length = tonumber(string.sub(data, offset, dataOffset - 1))
+        if not length then return nil end
         local value = string.sub(data, dataOffset + 1, dataOffset + length)
 
         offset = dataOffset + length + 1
@@ -69,7 +71,7 @@ end
 -- Packs multiple files into a single binary file
 ---@param path string
 ---@vararg string
-function BinPack.packFiles(path, ...)
+function BinPack.packFiles(outPath, ...)
     local paths = { ... }
     local files = {}
 
@@ -83,7 +85,7 @@ function BinPack.packFiles(path, ...)
         table.insert(files, data)
     end
 
-    return BinPack.save(path, table.unpack(files))
+    return BinPack.save(outPath, table.unpack(files))
 end
 
 return BinPack
